@@ -1,5 +1,11 @@
-package main
+package utils
 
-func main() {
-	$END$
+import "os"
+
+func DeleteFile(filename string) {
+	err := os.Remove(filename)
+
+	if err != nil {
+		panic(err)
+	}
 }

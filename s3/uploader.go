@@ -20,7 +20,7 @@ func getS3Client(region string) *s3.S3 {
 	return s3.New(s3Session, az)
 }
 
-func Upload(body io.ReadSeeker, bucket, key, region string, timeout time.Duration) {
+func upload(body io.ReadSeeker, bucket, key, region string, timeout time.Duration) {
 	s3Client := getS3Client(region)
 
 	// Create a context with a timeout that will abort the upload if it takes
@@ -55,4 +55,14 @@ func Upload(body io.ReadSeeker, bucket, key, region string, timeout time.Duratio
 	}
 
 	fmt.Printf("successfully uploaded file to %s/%s\n", bucket, key)
+}
+
+func UploadPhoto(filename, bucket, region string, timeout time.Duration) {
+	file, err := os.Open(filename)
+
+	if err != nil {
+		panic(err)
+	}
+
+	upload(file, bucket, filename, region, timeout)
 }

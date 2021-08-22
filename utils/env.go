@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func LoadEnv(vars []string) (env map[string]string) {
+func loadEnv(vars []string) (env map[string]string) {
 	env = make(map[string]string)
 	err := godotenv.Load()
 	if err != nil {
@@ -18,4 +18,18 @@ func LoadEnv(vars []string) (env map[string]string) {
 	}
 
 	return env
+}
+
+
+type env struct {
+	Bucket string
+	Region string
+}
+
+func GetEnv() *env {
+	vars := loadEnv([]string{"BUCKET_NAME", "AWS_REGION"})
+	bucket := vars["BUCKET_NAME"]
+	region := vars["AWS_REGION"]
+
+	return &env{bucket, region}
 }
