@@ -4,6 +4,8 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/joho/godotenv"
+	"log"
 	"os"
 	"time"
 
@@ -14,39 +16,38 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
-// Uploads a file to S3 given a bucket and object key. Also takes a duration
-// value to terminate the update if it doesn't complete within that time.
-//
-// The AWS Region needs to be provided in the AWS shared config or on the
-// environment variable as `AWS_REGION`. Credentials also must be provided
-// Will default to shared config file, but can load from environment if provided.
-//
+func loadEnv(vars []string) (env map[string]string) {
+	env = make(map[string]string)
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	for _, v := range vars {
+		env[v] = os.Getenv(v)
+	}
+
+	return env
+}
+
 // Usage:
 //   # Upload myfile.txt to myBucket/myKey. Must complete within 10 minutes or will fail
-//   go run withContext.go -b mybucket -k myKey -d 10m < myfile.txt
+//   go run withContext.go -k myKey -d 10m < myfile.txt
 func main() {
-	var bucket, key string
+	env := loadEnv([]string{"BUCKET_NAME", "AWS_REGION"})
+	bucket := env["BUCKET_NAME"]
+	region := env["AWS_REGION"]
+	var key string
 	var timeout time.Duration
 
-	flag.StringVar(&bucket, "b", "", "Bucket name.")
+	//flag.StringVar(&bucket, "b", "", "Bucket name.")
 	flag.StringVar(&key, "k", "", "Object key name.")
 	flag.DurationVar(&timeout, "d", 0, "Upload timeout.")
 	flag.Parse()
 
-	// All clients require a Session. The Session provides the client with
-	// shared configuration such as region, endpoint, and credentials. A
-	// Session should be shared where possible to take advantage of
-	// configuration and credential caching. See the session package for
-	// more information.
-	az := aws.NewConfig().WithRegion("ap-southeast-2")
-
-	sess := session.Must(session.NewSession())
-
-	// Create a new instance of the service's client with a Session.
-	// Optional aws.Config values can also be provided as variadic arguments
-	// to the New function. This option allows you to provide service
-	// specific configuration.
-	svc := s3.New(sess, az)
+	az := aws.NewConfig().WithRegion(region)
+	s3Session := session.Must(session.NewSession())
+	s3Client := s3.New(s3Session, az)
 
 	// Create a context with a timeout that will abort the upload if it takes
 	// more than the passed in timeout.
@@ -63,7 +64,7 @@ func main() {
 
 	// Uploads the object to S3. The Context will interrupt the request if the
 	// timeout expires.
-	_, err := svc.PutObjectWithContext(ctx, &s3.PutObjectInput{
+	_, err := s3Client.PutObjectWithContext(ctx, &s3.PutObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
 		Body:   os.Stdin,
