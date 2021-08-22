@@ -2,4 +2,4 @@
 
 # Usage: ./buildForPi.sh GoScriptToBuild.go NameOfBinary
 
-env GOOS=linux GOARCH=arm GOARM=5 go build -o $2 $1
+env CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=5 go build -o $2 $1
