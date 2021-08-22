@@ -4,12 +4,9 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"time"
 )
 
-func TakePhoto() {
-	filename := time.Now().Format(time.RFC3339) + ".jpg"
-
+func TakePhoto(filename string) {
 	cmd := exec.Command(
 		"fswebcam",
 		// Sets a 2-second delay
