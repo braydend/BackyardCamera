@@ -1,0 +1,14 @@
+[Unit]
+Description=Backyard camera server
+After=network-online.target
+
+[Service]
+ExecStart=/home/pi/server
+WorkingDirectory=/home/pi/
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
