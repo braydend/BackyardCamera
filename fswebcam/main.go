@@ -9,8 +9,6 @@ import (
 func TakePhoto(filename string) {
 	cmd := exec.Command(
 		"fswebcam",
-		// Sets a 2-second delay
-		"--delay",  "2",
 		// Sets the resolution to 1920x1080
 		"--resolution", "1920x1080",
 		// Skips first 10 frames
