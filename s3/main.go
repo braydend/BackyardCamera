@@ -57,6 +57,18 @@ func upload(body io.ReadSeeker, bucket, key, region string, timeout time.Duratio
 	fmt.Printf("successfully uploaded file to %s/%s\n", bucket, key)
 }
 
+func ListObjectsInBucket(bucket string) *s3.ListObjectsV2Output {
+	client := getS3Client("ap-southeast-2")
+
+	res, err := client.ListObjectsV2(&s3.ListObjectsV2Input{Bucket: &bucket})
+
+	if err != nil {
+		panic(err)
+	}
+
+	return res
+}
+
 func UploadPhoto(filename, bucket, region string, timeout time.Duration) {
 	file, err := os.Open(filename)
 
