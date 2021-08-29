@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"io"
+	"net/url"
 	"os"
 	"time"
 )
@@ -77,4 +78,19 @@ func UploadPhoto(filename, bucket, region string, timeout time.Duration) {
 	}
 
 	upload(file, bucket, filename, region, timeout)
+}
+
+type ObjectWithUrl struct {
+	Object *s3.Object
+	Url string
+}
+
+
+func MapUrlsToObjects(objects []*s3.Object, urlRoot string) (objectsWithUrl []ObjectWithUrl) {
+	for _, object := range objects {
+
+		objectsWithUrl = append(objectsWithUrl, ObjectWithUrl{object, fmt.Sprintf("%s/%s", urlRoot, url.QueryEscape(*object.Key))})
+	}
+
+	return objectsWithUrl
 }
