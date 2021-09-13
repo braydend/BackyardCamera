@@ -1,0 +1,34 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - "*v*.*.*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+
+      - name: Build lastPhoto Lambda handler
+        run: ./buildForLambda.sh lambda/lastPhoto/lastPhoto.go bin/lastPhoto
+
+      - name: Build lastPhotos Lambda handler
+        run: ./buildForLambda.sh lambda/lastPhotos/lastPhotos.go bin/lastPhotos
+
+      - name: Build logPhoto RaspberryPi binary
+        run: ./buildForPi.sh logPhoto.go bin/logPhoto
+
+      - name: Build server RaspberryPi binary
+        run: ./buildForPi.sh server.go bin/server
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./bin/*
