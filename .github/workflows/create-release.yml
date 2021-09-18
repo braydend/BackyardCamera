@@ -19,9 +19,6 @@ jobs:
       - name: Build lastPhoto Lambda handler
         run: ./buildForLambda.sh lambda/lastPhoto/lastPhoto.go bin/lastPhoto
 
-      - name: Build lastPhotos Lambda handler
-        run: ./buildForLambda.sh lambda/lastPhotos/lastPhotos.go bin/lastPhotos
-
       - name: Build logPhoto RaspberryPi binary
         run: ./buildForPi.sh logPhoto.go bin/logPhoto
 
