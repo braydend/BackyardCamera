@@ -16,9 +16,6 @@ jobs:
         with:
           go-version: 1.17
 
-      - name: Build lastPhoto Lambda handler
-        run: ./buildForLambda.sh lambda/lastPhoto/lastPhoto.go bin/lastPhoto
-
       - name: Build logPhoto RaspberryPi binary
         run: ./buildForPi.sh logPhoto.go bin/logPhoto
 
