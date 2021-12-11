@@ -8,10 +8,12 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"sort"
 	"strconv"
+	"time"
 )
 
 func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	objects, err := s3.ListObjectsInBucket("backyard-photos")
+	now := time.Now()
+	objects, err := s3.ListObjectsInBucket("backyard-photos", fmt.Sprintf("%d-%d", now.Year(), now.Month() ))
 
 	if err != nil {
 		fmt.Println(err)

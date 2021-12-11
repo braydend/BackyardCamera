@@ -58,10 +58,10 @@ func upload(body io.ReadSeeker, bucket, key, region string, timeout time.Duratio
 	fmt.Printf("successfully uploaded file to %s/%s\n", bucket, key)
 }
 
-func ListObjectsInBucket(bucket string) (*s3.ListObjectsV2Output, error) {
+func ListObjectsInBucket(bucket string, prefix string) (*s3.ListObjectsV2Output, error) {
 	client := getS3Client("ap-southeast-2")
 
-	res, err := client.ListObjectsV2(&s3.ListObjectsV2Input{Bucket: &bucket})
+	res, err := client.ListObjectsV2(&s3.ListObjectsV2Input{Bucket: &bucket, Prefix: aws.String(prefix)})
 
 	if err != nil {
 		return nil, err
