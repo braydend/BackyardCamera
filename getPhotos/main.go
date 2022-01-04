@@ -11,9 +11,18 @@ import (
 	"time"
 )
 
+const defaultLength = 10
+
+func buildDatePrefix(date time.Time) string {
+	month := date.Month()
+	year := date.Year()
+
+	return fmt.Sprintf("%d-%02d", year, month)
+}
+
 func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	now := time.Now()
-	objects, err := s3.ListObjectsInBucket("backyard-photos", fmt.Sprintf("%d-%d", now.Year(), now.Month() ))
+	objectPrefix := buildDatePrefix(time.Now())
+	objects, err := s3.ListObjectsInBucket("backyard-photos", objectPrefix)
 
 	if err != nil {
 		fmt.Println(err)
@@ -23,7 +32,11 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	limit, err := strconv.Atoi(request.QueryStringParameters["limit"])
 
 	if err != nil {
-		limit = 10
+		limit = defaultLength
+	}
+
+	if limit > len(objects.Contents) {
+		limit = len(objects.Contents)
 	}
 
 	sort.Slice(objects.Contents, func(i, j int) bool {
@@ -42,8 +55,8 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		Body:       string(response),
 		StatusCode: 200,
 		Headers: map[string]string{
-			"Access-Control-Allow-Headers" : "Content-Type",
-			"Access-Control-Allow-Origin": "*", // Allow from anywhere
+			"Access-Control-Allow-Headers": "Content-Type",
+			"Access-Control-Allow-Origin":  "*",   // Allow from anywhere
 			"Access-Control-Allow-Methods": "GET", // Allow only GET request
 		},
 	}, nil
